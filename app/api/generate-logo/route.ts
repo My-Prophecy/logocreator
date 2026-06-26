@@ -27,16 +27,6 @@ export async function POST(req: Request) {
     })
     .parse(json);
 
-  // Add observability if a Helicone key is specified, otherwise skip
-  const options: ConstructorParameters<typeof Together>[0] = {};
-  if (process.env.HELICONE_API_KEY) {
-    options.baseURL = "https://together.helicone.ai/v1";
-    options.defaultHeaders = {
-      "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-      "Helicone-Property-LOGOBYOK": data.userAPIKey ? "true" : "false",
-    };
-  }
-
   // Add rate limiting if Upstash API keys are set & no BYOK, otherwise skip
   if (process.env.UPSTASH_REDIS_REST_URL && !data.userAPIKey) {
     ratelimit = new Ratelimit({
@@ -48,7 +38,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const client = new Together(options);
+  const client = new Together();
 
   if (data.userAPIKey) {
     client.apiKey = data.userAPIKey;

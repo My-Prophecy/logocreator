@@ -7,11 +7,11 @@ const Footer = () => (
     <div className="mb-2 flex-grow pl-0 text-center md:mb-0 md:pl-0 lg:pl-48">
       <span className="text-sm text-[#6F6F6F]">
         Powered by{" "}
-        <a href="https://togetherai.link/" className="underline">
+        <a href="https://togetherai.link/?utm_source=logocreator&utm_medium=referral&utm_campaign=example-app" className="underline">
           Together.ai
         </a>{" "}
         &{" "}
-        <a href="https://togetherai.link/flux-playground" className="underline">
+        <a href="https://togetherai.link/?utm_source=logocreator&utm_medium=referral&utm_campaign=example-app" className="underline">
           Flux
         </a>
       </span>
