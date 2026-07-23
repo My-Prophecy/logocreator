@@ -1,25 +1,13 @@
-import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import dedent from "dedent";
 import Together from "together-ai";
 import { z } from "zod";
 
-let ratelimit: Ratelimit | undefined;
-
 export async function POST(req: Request) {
-  const user = await currentUser();
-
-  if (!user) {
-    return new Response("", { status: 404 });
-  }
-
   const json = await req.json();
   const data = z
     .object({
       userAPIKey: z.string().optional(),
       companyName: z.string(),
-      // selectedLayout: z.string(),
       selectedStyle: z.string(),
       selectedPrimaryColor: z.string(),
       selectedBackgroundColor: z.string(),
@@ -27,46 +15,10 @@ export async function POST(req: Request) {
     })
     .parse(json);
 
-  // Add rate limiting if Upstash API keys are set & no BYOK, otherwise skip
-  if (process.env.UPSTASH_REDIS_REST_URL && !data.userAPIKey) {
-    ratelimit = new Ratelimit({
-      redis: Redis.fromEnv(),
-      // Allow 3 requests per 2 months on prod
-      limiter: Ratelimit.fixedWindow(3, "60 d"),
-      analytics: true,
-      prefix: "logocreator",
-    });
-  }
-
   const client = new Together();
 
   if (data.userAPIKey) {
     client.apiKey = data.userAPIKey;
-    (await clerkClient()).users.updateUserMetadata(user.id, {
-      unsafeMetadata: {
-        remaining: "BYOK",
-      },
-    });
-  }
-
-  if (ratelimit) {
-    const identifier = user.id;
-    const { success, remaining } = await ratelimit.limit(identifier);
-    (await clerkClient()).users.updateUserMetadata(user.id, {
-      unsafeMetadata: {
-        remaining,
-      },
-    });
-
-    if (!success) {
-      return new Response(
-        "You've used up all your credits. Enter your own Together API Key to generate more logos.",
-        {
-          status: 429,
-          headers: { "Content-Type": "text/plain" },
-        },
-      );
-    }
   }
 
   const flashyStyle =

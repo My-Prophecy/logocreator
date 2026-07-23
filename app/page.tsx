@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { SignInButton, useUser } from "@clerk/nextjs";
+// Clerk removed for local use
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { DownloadIcon, RefreshCwIcon } from "lucide-react";
 import Image from "next/image";
@@ -72,7 +72,8 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState("");
 
-  const { isSignedIn, isLoaded, user } = useUser();
+  const isSignedIn = true;
+  const isLoaded = true;
 
   const handleAPIKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -103,7 +104,7 @@ export default function Page() {
     if (res.ok) {
       const json = await res.json();
       setGeneratedImage(`data:image/png;base64,${json.b64_json}`);
-      await user.reload();
+      // user reload removed
     } else if (res.headers.get("Content-Type") === "text/plain") {
       toast({
         variant: "destructive",
@@ -333,35 +334,7 @@ export default function Page() {
             </fieldset>
           </form>
 
-          {isLoaded && !isSignedIn && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 px-6"
-            >
-              <div className="rounded bg-gray-200 p-4 text-gray-900">
-                <p className="text-lg">
-                  Create a free account to start making logos:
-                </p>
-
-                <div className="mt-4">
-                  <SignInButton
-                    mode="modal"
-                    signUpForceRedirectUrl={domain}
-                    forceRedirectUrl={domain}
-                  >
-                    <Button
-                      size="lg"
-                      className="w-full text-base font-semibold"
-                      variant="secondary"
-                    >
-                      Sign in
-                    </Button>
-                  </SignInButton>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {/* Auth overlay removed for local use */}
         </div>
 
         <div className="flex w-full flex-col pt-12 md:pt-0">
